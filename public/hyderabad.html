@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyderabad Railway Stations | Smart Station</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2193b0;
+            --secondary: #6dd5ed;
+            --accent: #ff7e5f;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --text: #495057;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation Bar */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .nav.scrolled {
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+        }
+        
+        .account-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 147, 176, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .account-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 147, 176, 0.5);
+        }
+        
+        .account-details {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 280px;
+            z-index: 1001;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .account-details::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 25px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+        
+        .account-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .account-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .account-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .account-info p {
+            font-size: 14px;
+            color: var(--text);
+            opacity: 0.8;
+        }
+        
+        .account-menu {
+            list-style: none;
+        }
+        
+        .account-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .account-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .account-menu a:hover {
+            background: rgba(33, 147, 176, 0.1);
+            color: var(--primary);
+        }
+        
+        .account-menu i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 50px 0;
+            width: 100%;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .page-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--text);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Stations Grid */
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .station-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .station-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .station-image {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .station-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .station-card:hover .station-image img {
+            transform: scale(1.1);
+        }
+        
+        .station-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .station-content {
+            padding: 25px;
+        }
+        
+        .station-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .station-code {
+            background: rgba(33, 147, 176, 0.1);
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .station-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .station-location i {
+            color: var(--primary);
+        }
+        
+        .station-desc {
+            color: var(--text);
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .station-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+        }
+        
+        .station-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(33, 147, 176, 0.4);
+        }
+        
+        .station-button i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .station-button:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 50px 0 20px;
+        }
+        
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-logo img {
+            height: 40px;
+        }
+        
+        .footer-about p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .copyright {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            opacity: 0.7;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1rem;
+            }
+            
+            .account-details {
+                width: 250px;
+                right: 10px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .stations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="Trainlogo.png" alt="Smart Station Logo">
+                <span>Smart Station</span>
+            </a>
+            <div>
+                <button class="account-button" onclick="toggleAccountDetails()">
+                    <i class="fas fa-user-circle"></i> Account
+                </button>
+                <div class="account-details" id="accountDetails">
+                    <div class="account-header">
+                        <div class="account-avatar">YR</div>
+                        <div class="account-info">
+                            <h3>Y.V.Tarak Ram</h3>
+                            <p>23P61A05O0</p>
+                        </div>
+                    </div>
+                    <ul class="account-menu">
+                        <li><a href="#"><i class="fas fa-user"></i> My Profile</a></li>
+                        <li><a href="#"><i class="fas fa-ticket-alt"></i> My Tickets</a></li>
+                        <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header animate">
+                <h1 class="page-title">Hyderabad Railway Stations</h1>
+                <p class="page-subtitle">Explore the major railway stations connecting India's tech capital with the rest of the country</p>
+            </div>
+            
+            <div class="stations-grid">
+                <div class="station-card animate" style="animation-delay: 0.1s;">
+                    <div class="station-image">
+                        <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Hyderabad Deccan Station">
+                        <div class="station-badge">Main Station</div>
+                    </div>
+                    <div class="station-content">
+                        <h3>Hyderabad Deccan <span class="station-code">HYB</span></h3>
+                        <div class="station-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Nampally, Hyderabad
+                        </div>
+                        <p class="station-desc">The primary railway station serving Hyderabad, connecting major cities across India with modern amenities and facilities.</p>
+                        <a href="hyderabad.html" class="station-button">
+                            View Station <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="station-card animate" style="animation-delay: 0.2s;">
+                    <div class="station-image">
+                        <img src="https://images.unsplash.com/photo-1581093196277-1c8d47ab5b2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Secunderabad Junction">
+                        <div class="station-badge">Junction</div>
+                    </div>
+                    <div class="station-content">
+                        <h3>Secunderabad Junction <span class="station-code">SC</span></h3>
+                        <div class="station-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Secunderabad
+                        </div>
+                        <p class="station-desc">One of the largest railway junctions in South India with multiple platforms and extensive connectivity.</p>
+                        <a href="secunderabad.html" class="station-button">
+                            View Station <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="station-card animate" style="animation-delay: 0.3s;">
+                    <div class="station-image">
+                        <img src="https://images.unsplash.com/photo-1581093057305-408e5d78f5d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Kachiguda Station">
+                        <div class="station-badge">Terminal</div>
+                    </div>
+                    <div class="station-content">
+                        <h3>Kachiguda <span class="station-code">KCG</span></h3>
+                        <div class="station-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Kachiguda, Hyderabad
+                        </div>
+                        <p class="station-desc">Historic station known for its heritage architecture and serving as terminal for several important trains.</p>
+                        <a href="kachiguda.html" class="station-button">
+                            View Station <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="station-card animate" style="animation-delay: 0.4s;">
+                    <div class="station-image">
+                        <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Lingampalli Station">
+                    </div>
+                    <div class="station-content">
+                        <h3>Lingampalli <span class="station-code">LPI</span></h3>
+                        <div class="station-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Lingampalli, Hyderabad
+                        </div>
+                        <p class="station-desc">Serving the western IT corridor with modern facilities and connectivity to major tech hubs.</p>
+                        <a href="lingampalli.html" class="station-button">
+                            View Station <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="station-card animate" style="animation-delay: 0.5s;">
+                    <div class="station-image">
+                        <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80" alt="Hitech City Station">
+                        <div class="station-badge">MMTS</div>
+                    </div>
+                    <div class="station-content">
+                        <h3>Hitech City <span class="station-code">HTYC</span></h3>
+                        <div class="station-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Hitech City, Hyderabad
+                        </div>
+                        <p class="station-desc">Modern station serving Hyderabad's technology hub with frequent MMTS local train services.</p>
+                        <a href="hitechcity.html" class="station-button">
+                            View Station <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="station-card animate" style="animation-delay: 0.6s;">
+                    <div class="station-image">
+                        <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" alt="Begumpet Station">
+                    </div>
+                    <div class="station-content">
+                        <h3>Begumpet <span class="station-code">BMT</span></h3>
+                        <div class="station-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Begumpet, Hyderabad
+                        </div>
+                        <p class="station-desc">Convenient station in the commercial district with good connectivity to business centers.</p>
+                        <a href="begumpet.html" class="station-button">
+                            View Station <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <img src="Trainlogo.png" alt="Smart Station Logo">
+                    <span>Smart Station</span>
+                </div>
+                <p>Transforming rail travel with innovative technology and exceptional service since 2010.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Get Started</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Stations</h3>
+                <ul>
+                    <li><a href="hyderabad.html">Hyderabad Deccan</a></li>
+                    <li><a href="secunderabad.html">Secunderabad</a></li>
+                    <li><a href="kachiguda.html">Kachiguda</a></li>
+                    <li><a href="lingampalli.html">Lingampalli</a></li>
+                    <li><a href="hitechcity.html">Hitech City</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Feedback</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; <span id="currentYear"></span> Smart Station. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Account details toggle
+        function toggleAccountDetails() {
+            const details = document.getElementById('accountDetails');
+            details.style.display = details.style.display === 'block' ? 'none' : 'block';
+            
+            // Close when clicking outside
+            if (details.style.display === 'block') {
+                document.addEventListener('click', closeAccountDetails);
+            } else {
+                document.removeEventListener('click', closeAccountDetails);
+            }
+        }
+        
+        function closeAccountDetails(e) {
+            const accountButton = document.querySelector('.account-button');
+            const accountDetails = document.getElementById('accountDetails');
+            
+            if (!accountButton.contains(e.target) && !accountDetails.contains(e.target)) {
+                accountDetails.style.display = 'none';
+                document.removeEventListener('click', closeAccountDetails);
+            }
+        }
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+        
+        // Current year for copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // Animation on scroll
+        const animateElements = document.querySelectorAll('.animate');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        animateElements.forEach(element => {
+            element.style.opacity = 0;
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.6s ease';
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>

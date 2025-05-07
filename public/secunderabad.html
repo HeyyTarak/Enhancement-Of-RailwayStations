@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart Station</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<style>
+    body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #6dd5ed, #2193b0);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    }
+
+    .content {
+    width: 100%;
+    max-width: 1000px;
+    }
+
+    .station-info {
+    background: rgba(255, 255, 255, 0.9);
+    color: #2193b0;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .map-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    background: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .map-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    .icon {
+    position: absolute;
+    background: white;
+    color: #2193b0;
+    border: 2px solid #2193b0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    }
+
+    .icon:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .tooltip {
+    position: absolute;
+    background: #fff;
+    color: #2193b0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 10;
+    font-weight: 500;
+    }
+
+    .fullscreen-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2193b0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    }
+
+    .fullscreen-icon:hover {
+    background: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer {
+    margin-top: 30px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    }
+
+    /* Modal styles */
+    .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .modal-content {
+    background-color: white;
+    color: #2193b0;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+    }
+
+    .close-modal {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #2193b0;
+    transition: transform 0.2s;
+    }
+
+    .close-modal:hover {
+    transform: scale(1.1);
+    }
+
+    .modal-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #2193b0;
+    border-bottom: 2px solid rgba(33, 147, 176, 0.2);
+    padding-bottom: 10px;
+    }
+
+    .modal-description {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    font-size: 14px;
+    color: #555;
+    }
+
+    .modal-button {
+    display: inline-block;
+    background-color: #2193b0;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-right: 8px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    }
+
+    .modal-button:hover {
+    background-color: #1a7a8f;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    }
+
+    /* Different icon colors */
+    .icon.hotel {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: white;
+    }
+
+    .icon.food {
+    background: #4ecdc4;
+    border-color: #4ecdc4;
+    color: white;
+    }
+
+    .icon.service {
+    background: #ffbe76;
+    border-color: #ffbe76;
+    color: white;
+    }
+
+    .icon.transport {
+    background: #8395a7;
+    border-color: #8395a7;
+    color: white;
+    }
+
+    .icon.facility {
+    background: #546de5;
+    border-color: #546de5;
+    color: white;
+    }
+
+    .icon.platform {
+    background: #e66767;
+    border-color: #e66767;
+    color: white;
+    }
+
+    /* Menu specific styles */
+    .menu-category {
+    margin-top: 20px;
+    color: #e67e22;
+    font-weight: bold;
+    font-size: 15px;
+    }
+
+    .menu-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #eee;
+    font-size: 14px;
+    }
+
+    .menu-item-name {
+    font-weight: 500;
+    color: #333;
+    }
+
+    .menu-item-price {
+    color: #27ae60;
+    font-weight: bold;
+    }
+
+    .back-button {
+    background-color: #95a5a6 !important;
+    margin-right: 10px;
+    }
+
+    /* Booking form styles */
+    .booking-form input, .booking-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    box-sizing: border-box;
+    }
+
+    .booking-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #2193b0;
+    font-weight: 500;
+    font-size: 13px;
+    }
+
+    .form-title {
+    margin-bottom: 20px;
+    color: #2193b0;
+    }
+    
+    /* Ordering system styles */
+    .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    font-size: 13px;
+    }
+    
+    .order-item-controls {
+    display: flex;
+    align-items: center;
+    }
+    
+    .order-item-controls button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #2193b0;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    }
+    
+    .order-item-controls span {
+    margin: 0 10px;
+    min-width: 20px;
+    text-align: center;
+    color: #333;
+    }
+    
+    .order-total {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 20px;
+    text-align: right;
+    padding-top: 10px;
+    border-top: 2px solid rgba(33, 147, 176, 0.3);
+    color: #2193b0;
+    }
+    
+    /* Payment gateway styles */
+    .payment-container {
+    text-align: center;
+    }
+    
+    .payment-qr {
+    width: 180px;
+    height: 180px;
+    margin: 20px auto;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 10px;
+    padding: 10px;
+    }
+    
+    .payment-qr img {
+    width: 140px;
+    height: 140px;
+    }
+    
+    .payment-timer {
+    font-size: 12px;
+    color: #e74c3c;
+    margin-top: 5px;
+    }
+    
+    .payment-success {
+    color: #27ae60;
+    font-weight: bold;
+    margin: 20px 0;
+    font-size: 14px;
+    }
+    
+    /* Booking confirmation styles */
+    .booking-status {
+    text-align: center;
+    padding: 20px;
+    }
+    
+    .booking-status-icon {
+    font-size: 50px;
+    color: #27ae60;
+    margin-bottom: 20px;
+    }
+    
+    .progress-bar {
+    height: 8px;
+    background: #ecf0f1;
+    border-radius: 5px;
+    margin: 20px 0;
+    overflow: hidden;
+    }
+    
+    .progress {
+    height: 100%;
+    background: #2193b0;
+    width: 0%;
+    transition: width 1s;
+    }
+    
+    .status-message {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #555;
+    }
+</style>
+</head>
+<body>
+<div class="content">
+    <div class="station-info">
+    <h1 style="margin: 0; font-size: 24px;">Smart Station</h1>
+    <p style="margin: 5px 0 0; font-size: 14px; color: #555;">Interactive station map with facilities information</p>
+    </div>
+
+    <div class="map-container" id="mapContainer">
+    <img src="your-custom-blueprint.jpg" alt="Station Blueprint" />
+
+    <!-- Icons placed with dummy percentages, adjust as needed -->
+    <div class="icon service" style="left: 5%; top: 10%;" 
+        data-tooltip="Ticket Counter" 
+        onclick="showFacilityModal('Ticket Counter', 'Purchase tickets for your journey here. Open 24/7 with both automated machines and staffed counters available.', 'ticket')">
+        <i class="fas fa-ticket-alt" title="Ticket Counter"></i>
+    </div>
+    
+    <div class="icon food" style="left: 15%; top: 12%;" 
+        data-tooltip="Coffee Shop" 
+        onclick="showFacilityModal('Coffee Shop', 'Enjoy freshly brewed coffee, snacks and light meals at our station café. Open from 6AM to 10PM daily.', 'coffee')">
+        <i class="fas fa-mug-hot" title="Coffee Shop"></i>
+    </div>
+    
+    <div class="icon hotel" style="left: 8%; top: 5%;" 
+        data-tooltip="Station Hotel" 
+        onclick="showHotelModal()">
+        <i class="fas fa-hotel" title="Station Hotel"></i>
+    </div>
+    
+    <div class="icon facility" style="left: 70%; top: 30%;" 
+        data-tooltip="Dormitory" 
+        onclick="showFacilityModal('Dormitory', 'Affordable overnight accommodations for travelers. Shared rooms available for ₹800/night with secure lockers.', 'dormitory')">
+        <i class="fas fa-bed" title="Dormitory"></i>
+    </div>
+    
+    <div class="icon facility" style="left: 12%; top: 20%;" 
+        data-tooltip="Senior Citizen Room" 
+        onclick="showFacilityModal('Senior Citizen Room', 'A quiet resting area with comfortable seating designed for elderly passengers. Wheelchair accessible.', 'senior')">
+        <i class="fas fa-user-clock" title="Senior Citizen Room"></i>
+    </div>
+    
+    <div class="icon facility" style="left: 18%; top: 22%;" 
+        data-tooltip="Breastfeeding Room" 
+        onclick="showFacilityModal('Breastfeeding Room', 'Private, hygienic space for nursing mothers. Equipped with changing tables and comfortable seating.', 'nursing')">
+        <i class="fas fa-baby" title="Breastfeeding Room"></i>
+    </div>
+    
+    <div class="icon service" style="left: 30%; top: 15%;" 
+        data-tooltip="Shops" 
+        onclick="showFacilityModal('Shops', 'Various retail outlets offering travel essentials, souvenirs, books, and snacks. Open 8AM-9PM.', 'shops')">
+        <i class="fas fa-store" title="Shops"></i>
+    </div>
+    
+    <div class="icon facility" style="left: 25%; top: 28%;" 
+        data-tooltip="Toilets" 
+        onclick="showFacilityModal('Toilets', 'Clean public restrooms available 24/7. Disabled access facilities available. ₹10 entry fee applies.', 'toilets')">
+        <i class="fas fa-restroom" title="Toilets"></i>
+    </div>
+    
+    <div class="icon service" style="left: 85%; top: 20%;" 
+        data-tooltip="Cloak Room" 
+        onclick="showFacilityModal('Cloak Room', 'Secure luggage storage facility. ₹50 per bag for first 6 hours, ₹10 per additional hour. Open 6AM-11PM.', 'cloakroom')">
+        <i class="fas fa-suitcase-rolling" title="Cloak Room"></i>
+    </div>
+    
+    <div class="icon service" style="left: 90%; top: 35%;" 
+        data-tooltip="Parcel Office" 
+        onclick="showFacilityModal('Parcel Office', 'Ship packages and luggage to other stations. Domestic and international services available.', 'parcel')">
+        <i class="fas fa-box-open" title="Parcel Office"></i>
+    </div>
+    
+    <div class="icon transport" style="left: 50%; top: 60%;" 
+        data-tooltip="Foot Overbridge" 
+        onclick="showFacilityModal('Foot Overbridge', 'Connects all platforms and main station building. Elevator access available for disabled passengers.', 'bridge')">
+        <i class="fas fa-road" title="Foot Overbridge"></i>
+    </div>
+
+    <!-- Platform labels -->
+    <div class="icon platform" style="left: 40%; top: 70%;" 
+        data-tooltip="Platform 1" 
+        onclick="showFacilityModal('Platform 1', 'Main platform serving northbound express trains. Facilities include seating, digital displays, and food kiosks.', 'platform1')">
+        <i class="fas fa-train" title="Platform 1"></i>
+    </div>
+    
+    <div class="icon platform" style="left: 50%; top: 75%;" 
+        data-tooltip="Platform 2" 
+        onclick="showFacilityModal('Platform 2', 'Serves southbound local and regional trains. Wheelchair boarding assistance available.', 'platform2')">
+        <i class="fas fa-train" title="Platform 2"></i>
+    </div>
+    
+    <div class="icon platform" style="left: 60%; top: 80%;" 
+        data-tooltip="Platform 3" 
+        onclick="showFacilityModal('Platform 3', 'Dedicated platform for premium and long-distance trains. Lounge access for first-class passengers.', 'platform3')">
+        <i class="fas fa-train" title="Platform 3"></i>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+    <div class="fullscreen-icon" onclick="toggleFullScreen()">
+        <i class="fas fa-expand"></i>
+        <span>Fullscreen</span>
+    </div>
+    </div>
+
+    <div class="footer">
+    &copy; 2025 Smart Station. All rights reserved.
+    </div>
+</div>
+
+<!-- Main Modal Dialog -->
+<div class="modal" id="facilityModal">
+    <div class="modal-content" id="modalContent">
+    <!-- Content will be dynamically inserted here -->
+    </div>
+</div>
+
+<script>
+    // Global variables for cart
+    let cart = [];
+    let cartTotal = 0;
+    
+    function toggleFullScreen() {
+    const container = document.getElementById('mapContainer');
+    const fullscreenIcon = document.querySelector('.fullscreen-icon i');
+    const fullscreenText = document.querySelector('.fullscreen-icon span');
+    
+    if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(err => {
+        alert(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+        fullscreenIcon.className = 'fas fa-compress';
+        fullscreenText.textContent = 'Exit';
+    } else {
+        document.exitFullscreen();
+        fullscreenIcon.className = 'fas fa-expand';
+        fullscreenText.textContent = 'Fullscreen';
+    }
+    }
+
+    function showTooltip(event, text) {
+    const tooltip = document.getElementById('tooltip');
+    const icon = event.target.closest('.icon');
+    tooltip.innerText = text;
+    tooltip.style.left = icon.style.left;
+    tooltip.style.top = `calc(${icon.style.top} - 35px)`;
+    tooltip.style.display = 'block';
+    }
+
+    function hideTooltip() {
+    document.getElementById('tooltip').style.display = 'none';
+    }
+
+    // Show generic facility modal
+    function showFacilityModal(title, description, type) {
+    const modalContent = document.getElementById('modalContent');
+    let buttons = '';
+    
+    if (type === 'coffee') {
+        buttons = `
+        <button class="modal-button" onclick="showCoffeeMenu()"><i class="fas fa-book-open"></i> View Menu</button>
+        <button class="modal-button" onclick="showOrderMenu()"><i class="fas fa-mobile-alt"></i> Order Online</button>
+        `;
+    }
+    else if (type.includes('platform')) {
+        buttons = `
+        <button class="modal-button" onclick="alert('Showing platform schedule')"><i class="fas fa-clock"></i> Schedule</button>
+        <button class="modal-button" onclick="alert('Showing platform services')"><i class="fas fa-concierge-bell"></i> Services</button>
+        `;
+    }
+    else {
+        buttons = `
+        <button class="modal-button" onclick="alert('More information about this facility')"><i class="fas fa-info-circle"></i> More Info</button>
+        `;
+    }
+    
+    modalContent.innerHTML = `
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 class="modal-title">${title}</h2>
+        <p class="modal-description">${description}</p>
+        <div class="modal-buttons">
+        ${buttons}
+        </div>
+    `;
+    
+    document.getElementById('facilityModal').style.display = 'flex';
+    }
+
+    // Special modal for hotel
+    function showHotelModal() {
+    const modalContent = document.getElementById('modalContent');
+    
+    modalContent.innerHTML = `
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 class="modal-title">Station Hotel</h2>
+        <p class="modal-description">
+        Comfortable accommodations right at the station. Features include:<br><br>
+        • Free high-speed WiFi<br>
+        • 24-hour reception<br>
+        • Soundproof rooms<br>
+        • Hyderabadi cuisine restaurant<br>
+        • Starting at ₹2500/night
+        </p>
+        <div class="modal-buttons">
+        <button class="modal-button" onclick="showHotelMenu()"><i class="fas fa-utensils"></i> View Menu</button>
+        <button class="modal-button" onclick="showBookingForm('room')"><i class="fas fa-calendar-check"></i> Book Room</button>
+        <button class="modal-button" onclick="alert('Showing hotel photos')"><i class="fas fa-images"></i> Gallery</button>
+        </div>
+    `;
+    
+    document.getElementById('facilityModal').style.display = 'flex';
+    }
+
+    // Show coffee shop menu
+    function showCoffeeMenu() {
+    const modalContent = document.getElementById('modalContent');
+    
+    modalContent.innerHTML = `
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <button class="modal-button back-button" onclick="showFacilityModal('Coffee Shop', 'Enjoy freshly brewed coffee, snacks and light meals at our station café. Open from 6AM to 10PM daily.', 'coffee')"><i class="fas fa-arrow-left"></i> Back</button>
+        <h2 class="modal-title">Coffee Shop Menu</h2>
+        
+        <div class="menu-category">Hot Beverages</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Espresso</span>
+        <span class="menu-item-price">₹120</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Cappuccino</span>
+        <span class="menu-item-price">₹150</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Latte</span>
+        <span class="menu-item-price">₹160</span>
+        </div>
+        
+        <div class="menu-category">Cold Beverages</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Iced Coffee</span>
+        <span class="menu-item-price">₹180</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Cold Brew</span>
+        <span class="menu-item-price">₹200</span>
+        </div>
+        
+        <div class="menu-category">Snacks</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Croissant</span>
+        <span class="menu-item-price">₹80</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Sandwich</span>
+        <span class="menu-item-price">₹150</span>
+        </div>
+        
+        <div class="modal-buttons" style="margin-top:30px">
+        <button class="modal-button" onclick="showOrderMenu()"><i class="fas fa-mobile-alt"></i> Order Now</button>
+        </div>
+    `;
+    }
+
+    // Show Hyderabadi menu
+    function showHotelMenu() {
+    const modalContent = document.getElementById('modalContent');
+    
+    modalContent.innerHTML = `
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <button class="modal-button back-button" onclick="showHotelModal()"><i class="fas fa-arrow-left"></i> Back</button>
+        <h2 class="modal-title">Hyderabadi Cuisine</h2>
+        
+        <div class="menu-category">Biryani & Rice Dishes</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Hyderabadi Dum Biryani (Chicken)</span>
+        <span class="menu-item-price">₹350</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Hyderabadi Dum Biryani (Mutton)</span>
+        <span class="menu-item-price">₹450</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Veg Dum Biryani</span>
+        <span class="menu-item-price">₹250</span>
+        </div>
+        
+        <div class="menu-category">Kebabs & Starters</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Hyderabadi Haleem</span>
+        <span class="menu-item-price">₹200</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Boti Kebab</span>
+        <span class="menu-item-price">₹320</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Murgh Malai Kebab</span>
+        <span class="menu-item-price">₹280</span>
+        </div>
+        
+        <div class="menu-category">Breads & Sides</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Sheermal</span>
+        <span class="menu-item-price">₹50</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Mirchi Ka Salan</span>
+        <span class="menu-item-price">₹120</span>
+        </div>
+        
+        <div class="menu-category">Desserts</div>
+        <div class="menu-item">
+        <span class="menu-item-name">Double Ka Meetha</span>
+        <span class="menu-item-price">₹120</span>
+        </div>
+        <div class="menu-item">
+        <span class="menu-item-name">Qubani Ka Meetha</span>
+        <span class="menu-item-price">₹150</span>
+        </div>
+        
+        <div class="modal-buttons" style="margin-top:30px">
+        <button class="modal-button" onclick="showBookingForm('dining')"><i class="fas fa-utensils"></i> Reserve Table</button>
+        <button class="modal-button" onclick="showOrderMenu()"><i class="fas fa-mobile-alt"></i> Order Now</button>
+        </div>
+    `;
+    }
+
+    // Show order menu with cart functionality
+    function showOrderMenu() {
+    const modalContent = document.getElementById('modalContent');
+    
+    // Sample menu items
+    const menuItems = [
+        { id: 1, name: "Espresso", price: 120 },
+        { id: 2, name: "Cappuccino", price: 150 },
+        { id: 3, name: "Latte", price: 160 },
+        { id: 4, name: "Iced Coffee", price: 180 },
+        { id: 5, name: "Croissant", price: 80 },
+        { id: 6, name: "Sandwich", price: 150 },
+        { id: 7, name: "Hyderabadi Dum Biryani (Chicken)", price: 350 },
+        { id: 8, name: "Hyderabadi Haleem", price: 200 }
+    ];
+    
+    // Generate menu items HTML
+    let menuHtml = menuItems.map(item => `
+        <div class="order-item">
+            <div>
+                <div class="menu-item-name">${item.name}</div>
+                <div class="menu-item-price">₹${item.price}</div>
+            </div>
+            <div class="order-item-controls">
+                <button onclick="updateCart(${item.id}, -1)">-</button>
+                <span id="item-${item.id}-qty">${getItemQuantity(item.id)}</span>
+                <button onclick="updateCart(${item.id}, 1)">+</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Calculate total
+    updateCartTotal();
+    
+    modalContent.innerHTML = `
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <button class="modal-button back-button" onclick="showFacilityModal('Coffee Shop', 'Enjoy freshly brewed coffee, snacks and light meals at our station café. Open from 6AM to 10PM daily.', 'coffee')"><i class="fas fa-arrow-left"></i> Back</button>
+        <h2 class="modal-title">Order Food & Drinks</h2>
+        
+        ${menuHtml}
+        
+        <div class="order-total" id="cartTotal">
+            Total: ₹${cartTotal}
+        </div>
+        
+        <div class="modal-buttons" style="justify-content: center; margin-top:20px">
+            <button class="modal-button" onclick="showPaymentGateway()" ${cart.length === 0 ? 'disabled style="opacity:0.5"' : ''}>
+                <i class="fas fa-credit-card"></i> Order Now (₹${cartTotal})
+            </button>
+        </div>
+    `;
+    }
+    
+    // Get quantity of item in cart
+    function getItemQuantity(itemId) {
+        const item = cart.find(i => i.id === itemId);
+        return item ? item.quantity : 0;
+    }
+    
+    // Update cart items
+    function updateCart(itemId, change) {
+        const itemIndex = cart.findIndex(i => i.id === itemId);
+        
+        if (itemIndex > -1) {
+            // Item exists in cart
+            cart[itemIndex].quantity += change;
+            
+            // Remove if quantity is 0 or less
+            if (cart[itemIndex].quantity <= 0) {
+                cart.splice(itemIndex, 1);
+            }
+        } else if (change > 0) {
+            // Add new item to cart
+            const menuItems = [
+                { id: 1, name: "Espresso", price: 120 },
+                { id: 2, name: "Cappuccino", price: 150 },
+                { id: 3, name: "Latte", price: 160 },
+                { id: 4, name: "Iced Coffee", price: 180 },
+                { id: 5, name: "Croissant", price: 80 },
+                { id: 6, name: "Sandwich", price: 150 },
+                { id: 7, name: "Hyderabadi Dum Biryani (Chicken)", price: 350 },
+                { id: 8, name: "Hyderabadi Haleem", price: 200 }
+            ];
+            
+            const itemToAdd = menuItems.find(i => i.id === itemId);
+            if (itemToAdd) {
+                cart.push({
+                    id: itemToAdd.id,
+                    name: itemToAdd.name,
+                    price: itemToAdd.price,
+                    quantity: 1
+                });
+            }
+        }
+        
+        // Update quantity display
+        const qtyElement = document.getElementById(`item-${itemId}-qty`);
+        if (qtyElement) {
+            qtyElement.textContent = getItemQuantity(itemId);
+        }
+        
+        // Update total and refresh order button
+        updateCartTotal();
+        
+        // Refresh order button state
+        const orderButton = document.querySelector('.modal-button[onclick="showPaymentGateway()"]');
+        if (orderButton) {
+            if (cart.length === 0) {
+                orderButton.disabled = true;
+                orderButton.style.opacity = '0.5';
+            } else {
+                orderButton.disabled = false;
+                orderButton.style.opacity = '1';
+                orderButton.innerHTML = `<i class="fas fa-credit-card"></i> Order Now (₹${cartTotal})`;
+            }
+        }
+    }
+    
+    // Calculate cart total
+    function updateCartTotal() {
+        cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        const totalElement = document.getElementById('cartTotal');
+        if (totalElement) {
+            totalElement.textContent = `Total: ₹${cartTotal}`;
+        }
+    }
+    
+    // Show payment gateway
+    function showPaymentGateway() {
+        const modalContent = document.getElementById('modalContent');
+        
+        modalContent.innerHTML = `
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <button class="modal-button back-button" onclick="showOrderMenu()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 class="modal-title">Payment Gateway</h2>
+            
+            <div class="payment-container">
+                <p>Please scan the QR code to complete your payment of ₹${cartTotal}</p>
+                
+                <div class="payment-qr">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PaymentAmount:${cartTotal}" alt="Payment QR Code">
+                    <div class="payment-timer" id="qrTimer">Expires in 10 seconds</div>
+                </div>
+                
+                <div id="paymentStatus"></div>
+                
+                <p>Or enter your payment details below:</p>
+                
+                <form class="booking-form" style="text-align:left">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                    
+                    <label for="expiry">Expiry Date</label>
+                    <input type="text" id="expiry" placeholder="MM/YY" required>
+                    
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" placeholder="123" required>
+                    
+                    <button type="button" class="modal-button" onclick="processPayment()" style="margin-top:20px">
+                        <i class="fas fa-check-circle"></i> Complete Payment
+                    </button>
+                </form>
+            </div>
+        `;
+        
+        // Start QR code timer
+        startQrTimer();
+    }
+    
+    // QR code timer countdown
+    function startQrTimer() {
+        let timeLeft = 10;
+        const timerElement = document.getElementById('qrTimer');
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = `Expires in ${timeLeft} seconds`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = "QR code expired";
+                document.querySelector('.payment-qr img').style.opacity = '0.3';
+            }
+        }, 1000);
+    }
+    
+        // Process payment
+        function processPayment() {
+        const paymentStatus = document.getElementById('paymentStatus');
+        paymentStatus.innerHTML = '<div class="payment-success"><i class="fas fa-spinner fa-spin"></i> Processing payment...</div>';
+        
+        // Simulate payment processing
+        setTimeout(() => {
+            paymentStatus.innerHTML = `
+                <div class="payment-success">
+                    <i class="fas fa-check-circle"></i> Payment successful!
+                </div>
+                <p>Your order has been placed successfully.</p>
+            `;
+            
+            // Show order confirmation
+            setTimeout(showOrderConfirmation, 1500);
+        }, 2000);
+    }
+    
+    // Show order confirmation
+    function showOrderConfirmation() {
+        const modalContent = document.getElementById('modalContent');
+        
+        modalContent.innerHTML = `
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="booking-status">
+                <div class="booking-status-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Order Confirmed!</h2>
+                
+                <div class="progress-bar">
+                    <div class="progress" style="width: 100%"></div>
+                </div>
+                
+                <p class="status-message">Your order is being prepared.</p>
+                <p>Order number: #${Math.floor(100000 + Math.random() * 900000)}</p>
+                
+                <div class="modal-buttons" style="justify-content: center; margin-top:30px">
+                    <button class="modal-button" onclick="closeModal()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button class="modal-button" onclick="showOrderMenu()">
+                        <i class="fas fa-utensils"></i> Order Again
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Clear the cart after successful order
+        cart = [];
+        cartTotal = 0;
+    }
+    
+    // Show booking form for hotel or dining
+    function showBookingForm(type) {
+        const modalContent = document.getElementById('modalContent');
+        const isRoomBooking = type === 'room';
+        
+        modalContent.innerHTML = `
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <button class="modal-button back-button" onclick="${isRoomBooking ? 'showHotelModal()' : 'showHotelMenu()'}">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <h2 class="modal-title">${isRoomBooking ? 'Hotel Room Booking' : 'Dining Reservation'}</h2>
+            
+            <form class="booking-form">
+                <label for="bookingName">Full Name</label>
+                <input type="text" id="bookingName" required>
+                
+                <label for="bookingEmail">Email</label>
+                <input type="email" id="bookingEmail" required>
+                
+                <label for="bookingPhone">Phone Number</label>
+                <input type="tel" id="bookingPhone" required>
+                
+                ${isRoomBooking ? `
+                    <label for="checkIn">Check-in Date</label>
+                    <input type="date" id="checkIn" required>
+                    
+                    <label for="checkOut">Check-out Date</label>
+                    <input type="date" id="checkOut" required>
+                    
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType" required>
+                        <option value="">Select room type</option>
+                        <option value="standard">Standard Room (₹2500/night)</option>
+                        <option value="deluxe">Deluxe Room (₹3500/night)</option>
+                        <option value="suite">Suite (₹5000/night)</option>
+                    </select>
+                    
+                    <label for="guests">Number of Guests</label>
+                    <input type="number" id="guests" min="1" max="4" value="1" required>
+                ` : `
+                    <label for="bookingDate">Reservation Date</label>
+                    <input type="date" id="bookingDate" required>
+                    
+                    <label for="bookingTime">Time</label>
+                    <input type="time" id="bookingTime" required>
+                    
+                    <label for="partySize">Party Size</label>
+                    <input type="number" id="partySize" min="1" max="10" value="2" required>
+                `}
+                
+                <label for="specialRequests">Special Requests</label>
+                <input type="text" id="specialRequests" placeholder="Any special requirements">
+                
+                <button type="button" class="modal-button" onclick="submitBooking('${type}')" style="margin-top:20px">
+                    <i class="fas fa-calendar-check"></i> ${isRoomBooking ? 'Book Room' : 'Reserve Table'}
+                </button>
+            </form>
+        `;
+        
+        // Set min date to today
+        const today = new Date().toISOString().split('T')[0];
+        if (isRoomBooking) {
+            document.getElementById('checkIn').min = today;
+            document.getElementById('checkOut').min = today;
+        } else {
+            document.getElementById('bookingDate').min = today;
+        }
+    }
+    
+    // Submit booking form
+    function submitBooking(type) {
+        const isRoomBooking = type === 'room';
+        const bookingForm = document.querySelector('.booking-form');
+        const allInputs = bookingForm.querySelectorAll('input, select');
+        let isValid = true;
+        
+        // Simple validation
+        allInputs.forEach(input => {
+            if (input.required && !input.value) {
+                input.style.borderColor = '#e74c3c';
+                isValid = false;
+            } else {
+                input.style.borderColor = '#ddd';
+            }
+        });
+        
+        if (!isValid) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        // Show booking confirmation
+        showBookingConfirmation(type);
+    }
+    
+    // Show booking confirmation
+    function showBookingConfirmation(type) {
+        const isRoomBooking = type === 'room';
+        const modalContent = document.getElementById('modalContent');
+        
+        modalContent.innerHTML = `
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="booking-status">
+                <div class="booking-status-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Booking Confirmed!</h2>
+                
+                <div class="progress-bar">
+                    <div class="progress" style="width: 100%"></div>
+                </div>
+                
+                <p class="status-message">Your ${isRoomBooking ? 'room reservation' : 'dining reservation'} has been confirmed.</p>
+                <p>Confirmation number: #${Math.floor(100000 + Math.random() * 900000)}</p>
+                
+                <div class="modal-buttons" style="justify-content: center; margin-top:30px">
+                    <button class="modal-button" onclick="closeModal()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button class="modal-button" onclick="showBookingForm('${type}')">
+                        <i class="fas fa-calendar-plus"></i> New Booking
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Close modal dialog
+    function closeModal() {
+        document.getElementById('facilityModal').style.display = 'none';
+    }
+    
+    // Initialize icon tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const icons = document.querySelectorAll('.icon');
+        icons.forEach(icon => {
+            const tooltipText = icon.getAttribute('data-tooltip');
+            
+            icon.addEventListener('mouseenter', (e) => {
+                showTooltip(e, tooltipText);
+            });
+            
+            icon.addEventListener('mouseleave', hideTooltip);
+        });
+        
+        // Close modal when clicking outside content
+        document.getElementById('facilityModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    });
+</script>
+</body>
+</html>
