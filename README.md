@@ -22,7 +22,7 @@ discounts, and more.
 
 Technology Stack:
 • Frontend: HTML, Map Library, CSS
-• Backend: Python, Django, Database, GeoJSON, Data Structures
+• Backend: Python, Django, Database, GeoJSON, Node
 
 Solution Representation:
 We represent our solution through image snapshots, screen recordings,
